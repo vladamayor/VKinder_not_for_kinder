@@ -13,7 +13,7 @@ session = Session()
 
 
 
-def adding_data(session, data):
+def adding_data(data):
     ...
 
     session.add_all(resault)
