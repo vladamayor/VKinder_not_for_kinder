@@ -3,8 +3,6 @@ from random import randrange
 import os
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
-from vk_api.keyboard import VkKeyboard, VkKeyboardColor
-
 
 
 def write_msg(vk_session, user_id, message, keyboard=None):
@@ -44,3 +42,17 @@ def collect_data(data, user_id, dict_data):
         dict_data['sex'] = 1
     city = data[2].title()
     dict_data['city_id'] = search_city(city)
+
+
+def search_name(user_id):
+    base_host = 'https://api.vk.com/'
+    uri = 'method/users.get'
+    URL = base_host + uri
+    user_params = {
+            'access_token': os.getenv('access_token_app'),
+            'v': '5.131',
+            'user_ids': user_id
+    }
+    req = requests.get(URL, params=user_params).json()
+    name = req['response'][0]['first_name']
+    return name
