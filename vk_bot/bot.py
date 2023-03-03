@@ -47,21 +47,3 @@ def get_info():
             else:
                 write_msg(vk_session, user_id, 'По-инопланетному пока не умею.. но я учусь')
     return dict_data
-
-
-  
-
-
-
-
-
-            
-            
-# elif text == 'выход':
-#     write_msg(user_id, 'Пока, приходи еще!')
-#     break
-
-# buttons = ['Поехали!', 'Выход']
-# buttons_color = [VkKeyboardColor.POSITIVE, VkKeyboardColor.NEGATIVE] 
-# for btn, btn_color in zip(buttons, buttons_color):
-#     keyboard.add_button(btn, btn_color)
