@@ -3,6 +3,7 @@ import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 import os
 from dotenv import load_dotenv, find_dotenv
+from pprint import pprint
 
 load_dotenv(find_dotenv())
 
@@ -30,8 +31,8 @@ adding_data_user(test_id)
 # Добавляет даныые candidates в базу.
 # (id кандидата, тья и фамилию, ссылку на страничку кандидата, фото, id user)
 def adding_data_candidates(candidate_id, first_last_name, link, photos, user):
-    session.add(User(candidate_id=candidate_id, first_last_name=first_last_name,
-                     link=link, photos=photos, user=user))
+    session.add(Candidat(candidate_id=candidate_id, first_last_name=first_last_name,
+                         link=link, photos=photos, id_user=user))
     session.commit()
     session.close()
 
@@ -49,11 +50,11 @@ adding_data_candidates(test_can_id, test_f_l_name, test_link, test_photos, test_
 # Добавляет даныые в базу favorites.
 # (id кандидата, тья и фамилию, ссылку на страничку кандидата, фото, id user)
 def adding_data_favorites(favorite_id, first_last_name, link, photos, user):
-    session.add(User(favorite_id=favorite_id, first_last_name=first_last_name,
-                     link=link, photos=photos, user=user))
+    session.add(Favorit(favorite_id=favorite_id, first_last_name=first_last_name,
+                        link=link, photos=photos, id_user=user))
     session.commit()
     session.close()
 
 
-test = session.query(Candidat).all()
-print(test)
+for test in session.query(Candidat).all():
+    print(test)

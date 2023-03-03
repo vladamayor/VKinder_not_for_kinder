@@ -25,6 +25,9 @@ class Candidat(Base):
 
     user = relationship(User, backref="candidat")
 
+    def __str__(self):
+        return f'{self.candidate_id}, {self.first_last_name}, {self.link}, {self.photos}'
+
 
 class Favorit(Base):
     __tablename__ = "favorites"
