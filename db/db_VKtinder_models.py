@@ -26,7 +26,7 @@ class Candidat(Base):
     user = relationship(User, backref="candidat")
 
     def __str__(self):
-        return f'{self.candidate_id}, {self.first_last_name}, {self.link}, {self.photos}'
+        return f'{self.id}, {self.candidate_id}, {self.first_last_name}, {self.link}, {self.photos}, {self.id_user}'
 
 
 class Favorit(Base):
