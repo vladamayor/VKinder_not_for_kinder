@@ -27,7 +27,7 @@ def adding_data_user(data):
 # Добавляет даныые candidates в базу.
 # (id кандидата, тья и фамилию, ссылку на страничку кандидата, фото, id user)
 def adding_data_candidates(candidate_id, first_last_name, link, photos, user):
-    session.add(Candidat(candidate_id=candidate_id, first_last_name=first_last_name,
+    session.add(Candidat(candidate_vk_id=candidate_id, first_last_name=first_last_name,
                          link=link, photos=photos, id_user=user))
     session.commit()
     session.close()
