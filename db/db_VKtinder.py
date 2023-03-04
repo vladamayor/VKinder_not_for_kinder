@@ -52,6 +52,14 @@ def issues_candidate(user_id):
         return result
 
 
+def issues_favorite(user_id):
+    # Поиск ID в базе по его id в VK. Принимает на вход id VK, на выходе id в базе(Целое число)
+    res = session.query(User.id).filter(User.user_vk_id == user_id).all()
+    ress = res[0][0]
+    # Выдает по одному из избранных.
+    for result in session.query(Favorit).filter(Favorit.id_user == ress).all():
+        return result
+
 # Удаление кандидата из таблицы candidates
 def deleted_candidate(candidate_id):
     session.query(Candidat).filter(Candidat.candidate_vk_id == candidate_id).delete()
