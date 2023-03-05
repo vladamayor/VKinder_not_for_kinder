@@ -1,4 +1,4 @@
-from db_VKtinder_models import create_tables, User, Candidat, Favorit
+from db.db_VKtinder_models import create_tables, User, Candidat, Favorit
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 import os
@@ -11,7 +11,7 @@ DSN = f'postgresql://{os.getenv("LOGIN")}:{os.getenv("PASSWORD")}@' \
       f'{os.getenv("SERVER")}:{os.getenv("PORT")}/{os.getenv("DB_NAME")}'
 engine = sqlalchemy.create_engine(DSN)
 
-# create_tables(engine)
+create_tables(engine)
 
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -19,18 +19,30 @@ session = Session()
 
 # Добавление ID user в базу
 def adding_data_user(data):
-    session.add(User(user_vk_id=data))
+    result = session.query(User.user_vk_id).all()
+    list_id_vk = []
+    for item in result:
+        list_id_vk.append(item[0])
+    if data not in list_id_vk:
+        session.add(User(user_vk_id=data))
+    else:
+        pass
     session.commit()
     session.close()
-
+    result = session.query(User.user_vk_id).all()
+    print(result)
 
 # Добавляет даныые candidates в базу.
 # (id кандидата, тья и фамилию, ссылку на страничку кандидата, фото, id user)
-def adding_data_candidates(candidate_id, first_last_name, link, photos, user):
+def adding_data_candidates(candidate_id, first_last_name, link, photos, user_id):
+    res = session.query(User.id).filter(User.user_vk_id == user_id).all()
+    ress = res[0][0]
     session.add(Candidat(candidate_vk_id=candidate_id, first_last_name=first_last_name,
-                         link=link, photos=photos, id_user=user))
+                         link=link, photos=photos, id_user=ress))
     session.commit()
     session.close()
+    result = session.query(Candidat).all()
+    print(result)
 
 
 # Добавляет даныые в базу favorites.

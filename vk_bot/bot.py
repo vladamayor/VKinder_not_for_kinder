@@ -5,6 +5,7 @@ load_dotenv(find_dotenv())
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 from vk_bot.bot_function import write_msg, collect_data, search_name
+from db.db_VKtinder import adding_data_user
 
 
 
@@ -25,6 +26,7 @@ def get_info():
             if text in answer_get or text.split()[1] == 'жен' or 'муж':
 
                 if text == 'привет':
+                    adding_data_user(user_id)
                     keyboard = VkKeyboard(one_time=True)
                     keyboard.add_button('Старт', VkKeyboardColor.POSITIVE)
                     write_msg(vk_session, user_id, f'Приветик, {name}! Показать что я умею? Жми на "Старт"', keyboard)
