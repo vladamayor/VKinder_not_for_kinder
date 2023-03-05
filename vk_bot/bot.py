@@ -8,12 +8,11 @@ from vk_bot.bot_function import write_msg, collect_data, search_name
 
 
 
-
 vk_session = vk_api.VkApi(token=os.getenv('access_token_community'))
 longpoll = VkLongPoll(vk_session)
 
 
-answer = ['привет', 'старт']
+answer_get = ['привет', 'старт']
 
 dict_data = {}
 def get_info():
@@ -23,7 +22,7 @@ def get_info():
             text = event.text.lower()
             name = search_name(user_id)
 
-            if text in answer or text.split()[1] == 'жен' or 'муж':
+            if text in answer_get or text.split()[1] == 'жен' or 'муж':
 
                 if text == 'привет':
                     keyboard = VkKeyboard(one_time=True)
@@ -46,22 +45,5 @@ def get_info():
 
             else:
                 write_msg(vk_session, user_id, 'По-инопланетному пока не умею.. но я учусь')
+                break
     return dict_data
-
-
-  
-
-
-
-
-
-            
-            
-# elif text == 'выход':
-#     write_msg(user_id, 'Пока, приходи еще!')
-#     break
-
-# buttons = ['Поехали!', 'Выход']
-# buttons_color = [VkKeyboardColor.POSITIVE, VkKeyboardColor.NEGATIVE] 
-# for btn, btn_color in zip(buttons, buttons_color):
-#     keyboard.add_button(btn, btn_color)

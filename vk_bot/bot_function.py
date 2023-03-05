@@ -5,17 +5,20 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
 
-def write_msg(vk_session, user_id, message, keyboard=None):
+def write_msg(vk_session, user_id, message, keyboard=None, attachments=None):
     post = {'user_id': user_id, 
             'message': message,
             'random_id': randrange(10 ** 7)
     }
-    if keyboard != None:
+    if attachments != None:
+        post['attachment'] = attachments
+    elif keyboard != None:
         post['keyboard'] = keyboard.get_keyboard()
     else:
         post = post
 
     vk_session.method('messages.send', post)
+
 
 def search_city(city):
     base_host = 'https://api.vk.com/'
