@@ -1,15 +1,22 @@
-from vk_bot.bot import get_info
+#from bot import get_info
 import os
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 import requests
-from pprint import pprint
+from vk_api import VkUpload 
+from vk_api import VkApi
+import vk_api
 
 
-data = {'user_id': 787161190, 'age_from': 18, 'age_to': 26, 'sex': 1, 'city_id': 1}
+#data = get_info()
+#print(data)
+#data = {'user_id': 787161190, 'age_from': 18, 'age_to': 26, 'sex': 2, 'city_id': 1}
 #print(data)
 
-token = os.getenv('access_token_app')
+# token = os.getenv('access_token_app')
+# vk_session = vk_api.VkApi(token=os.getenv('access_token_community'))
+
+
 list_data = []
 
 class VKUser():
@@ -36,7 +43,7 @@ class VKUser():
         return req['response']['items']
     
 
-    def create_archive(self, data):
+    def create_archive(self, data, vk_session):
         req = self.search_сandidates(data)
         for item in req:
             user_data = {}
@@ -45,13 +52,19 @@ class VKUser():
             user_data['user'] = ' '.join(user)
             user_id = item['id']
             user_data['link'] = base_user_host + str(user_id)
+            link = base_user_host + str(user_id)
             list_data.append(user_data)
+            user_data['photos'] = self.get_photo(data, vk_session)
+    
+        return user, link
+
 
 
 # Значение count временно 3, далее будет 1000
 
-    def get_photo(self, data):
+    def get_photo(self, data, vk_session):
         req = self.search_сandidates(data)
+        upload = VkUpload(vk_session)
         for item in req:
             user_id = item['id']
             get_photo_url = self.url + 'photos.get'
@@ -59,17 +72,26 @@ class VKUser():
                 'owner_id': user_id,
                 'album_id': 'profile',
                 'extended': '1',
-                'count': 3,
+                'count': 2,
             }
             req = requests.get(get_photo_url, params={**self.params, **get_photos_params}).json()['response']
-            pprint(req)
+            
+        d_ph={}
+            
+        for photos in req['items']:
+            image_url = photos['sizes'][-1]['url']
+            image = requests.get(image_url, stream=True)
+            photo = upload.photo_messages(photos=image.raw)[0]
+            d_ph[photos['likes']['count']] ='photo{}_{}'.format(photo['owner_id'], photo['id'])
+            if len(req['items']) > 3 :
+                sort_d_ph = dict(sorted(d_ph.items(), key=lambda x: x[0])[len(d_ph):len(d_ph)-4:-1])
+                l_s_photo = list(sort_d_ph.values())
+            else:
+                l_s_photo = d_ph.values()
+
+        return ','.join(l_s_photo)
 
 
 
-
-
-
-
-users = VKUser(token)
-print(users.get_photo(data))
-#print(list_data)
+# users = VKUser(token)
+# print(users.get_photo(data, vk_session))
