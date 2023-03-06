@@ -36,10 +36,9 @@ def show_info():
                     buttons_color = [VkKeyboardColor.POSITIVE, VkKeyboardColor.PRIMARY] 
                     for btn, btn_color in zip(buttons, buttons_color):
                         keyboard.add_button(btn, btn_color)
-                    attachments = users.get_photo(data, vk_session)
-                    fio, link = users.create_archive(data, vk_session)
+                    fio, link, user_photo = users.create_archive(data, vk_session)
                     write_msg(vk_session, user_id, f'{fio} \n {link}', keyboard)
-                    write_msg(vk_session, user_id, ' ', keyboard, attachments)
+                    write_msg(vk_session, user_id, ' ', keyboard, user_photo)
                     break  
     return print('ok')
 
