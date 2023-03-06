@@ -1,4 +1,4 @@
-from db_VKtinder_models import create_tables, User, Candidat, Favorit
+from db.db_VKtinder_models import create_tables, User, Candidat, Favorit
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 import os
@@ -11,7 +11,7 @@ DSN = f'postgresql://{os.getenv("LOGIN")}:{os.getenv("PASSWORD")}@' \
       f'{os.getenv("SERVER")}:{os.getenv("PORT")}/{os.getenv("DB_NAME")}'
 engine = sqlalchemy.create_engine(DSN)
 
-# create_tables(engine)
+create_tables(engine)
 
 Session = sessionmaker(bind=engine)
 session = Session()

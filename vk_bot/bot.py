@@ -21,12 +21,12 @@ def get_info():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
             user_id = event.user_id
             text = event.text.lower()
-            name = search_name(user_id)
-
+            
             if text in answer_get or text.split()[1] == 'жен' or 'муж':
 
                 if text == 'привет':
                     adding_data_user(user_id)
+                    name = search_name(user_id)
                     keyboard = VkKeyboard(one_time=True)
                     keyboard.add_button('Старт', VkKeyboardColor.POSITIVE)
                     write_msg(vk_session, user_id, f'Приветик, {name}! Показать что я умею? Жми на "Старт"', keyboard)
