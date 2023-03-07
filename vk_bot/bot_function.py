@@ -3,6 +3,7 @@ from random import randrange
 import os
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
+from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 
 
 def write_msg(vk_session, user_id, message, keyboard=None, attachments=None):
@@ -18,6 +19,17 @@ def write_msg(vk_session, user_id, message, keyboard=None, attachments=None):
         post = post
 
     vk_session.method('messages.send', post)
+
+def send_candidate(vk_session, token, data,  user_id, candidate):
+    keyboard = VkKeyboard()
+    buttons = ['Нравится', 'Дальше']
+    buttons_color = [VkKeyboardColor.POSITIVE, VkKeyboardColor.PRIMARY] 
+    for btn, btn_color in zip(buttons, buttons_color):
+        keyboard.add_button(btn, btn_color)
+    fio, link, user_photo, candidate_id = candidate.get_photo(data, vk_session)
+    write_msg(vk_session, user_id, f'{fio} \n {link}', keyboard)
+    write_msg(vk_session, user_id, ' ', keyboard, user_photo)
+    return candidate_id
 
 
 def search_city(city):
@@ -59,3 +71,4 @@ def search_name(user_id):
     req = requests.get(URL, params=user_params).json()
     name = req['response'][0]['first_name']
     return name
+

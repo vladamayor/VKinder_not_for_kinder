@@ -33,12 +33,12 @@ def adding_data_user(data):
 
 # Добавляет даныые candidates в базу.
 # (id_vk , имя и фамилию, ссылку на страничку, фото). Параметр user_id принимает vk_id польз-я который сделал запрос.
-def adding_data_candidates(candidate_id, first_last_name, link, photos, user_id):
+def adding_data_candidates(candidate_id, first_last_name, link, user_id):
     # Поиск ID в базе по id в VK. Принимает на вход id VK, на выходе id в базе(Целое число)
     res = session.query(User.id).filter(User.user_vk_id == user_id).all()
     ress = res[0][0]
-    session.add(Candidat(candidate_vk_id=candidate_id, first_last_name=first_last_name,
-                         link=link, photos=photos, id_user=ress))
+    session.add(Candidat(candidate_vk_id=candidate_id,first_last_name=first_last_name,
+                        link=link, id_user=ress))
     session.commit()
     session.close()
 
@@ -61,8 +61,9 @@ def issues_candidate(user_id):
     res = session.query(User.id).filter(User.user_vk_id == user_id).all()
     ress = res[0][0]
     # Выдает по одному кандидатов.
-    for result in session.query(Candidat).filter(Candidat.id_user == ress).all():
-        return result
+    result = session.query(Candidat.candidate_vk_id, Candidat.first_last_name, Candidat.link).filter(Candidat.id_user == ress).first()
+    print(result)
+    return result
 
 
 def issues_favorite(user_id):

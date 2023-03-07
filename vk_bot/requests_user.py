@@ -9,6 +9,7 @@ import vk_api
 from db.db_VKtinder import adding_data_candidates
 from pprint import pprint
 from time import sleep
+from db.db_VKtinder import issues_candidate
 
 
 #data = get_info()
@@ -20,7 +21,7 @@ from time import sleep
 # vk_session = vk_api.VkApi(token=os.getenv('access_token_community'))
 
 
-list_data = []
+#list_data = []
 
 class VKUser():
     url = 'https://api.vk.com/method/'
@@ -35,7 +36,7 @@ class VKUser():
     def search_сandidates(self, data):
         search_сandidates_url = self.url + 'users.search'
         candidates_params = {
-                'count': 50,
+                'count': 1000,
                 'has_photo': 1,
                 'age_from': data['age_from'],
                 'age_to': data['age_to'],
@@ -43,6 +44,7 @@ class VKUser():
                 'city_id': data['city_id'],
         }  
         req = requests.get(search_сandidates_url, params={**self.params, **candidates_params}).json()
+        #pprint(req)
         return req['response']['items']
         # while req.status_code == 200:
         #     results = req.json()['response']['items']
@@ -57,36 +59,44 @@ class VKUser():
         for user in req:
             if user['is_closed'] == False:
                     user_data = {}
-                    user_photo = self.get_photo(data, vk_session, user)
-                    user_data['photos'] = user_photo
-                    if not user_photo:
-                        pass
-                    else:
-                        base_user_host = 'https://vk.com/id'
-                        candidate = [user['first_name'] , user['last_name']]
-                        fio = ' '.join(candidate)
-                        user_data['user'] = fio
-                        user_id = user['id']
-                        user_data['link'] = base_user_host + str(user_id)
-                        link = base_user_host + str(user_id)
-                        list_data.append(user_data)
-                        adding_data_candidates(user_id, fio, link, user_photo, user_base)
+                    #user_photo = self.get_photo(data, vk_session, user)
+                    #user_data['photos'] = user_photo
+                    #if not user_photo:
+                    #    pass
+                    #else:
+                    base_user_host = 'https://vk.com/id'
+                    candidate = [user['first_name'] , user['last_name']]
+                    fio = ' '.join(candidate)
+                    user_data['user'] = fio
+                    user_id = user['id']
+                    user_data['link'] = base_user_host + str(user_id)
+                    link = base_user_host + str(user_id)
+                    adding_data_candidates(user_id, fio, link, user_base)
             
-        return fio, link, user_photo
+        return print('База создана')
 
 
+    def get_candidate(self, data):
+        user_id = data['user_id']
+        id_candidate =  issues_candidate(user_id)
+        get_candidate = self.url + 'users.get'
+        get_candidate_params = {
+            'user_ids': id_candidate
+        }
 
 # Значение count временно 3, далее будет 1000
 
-    def get_photo(self, data, vk_session,user):
+    def get_photo(self, data, vk_session):
         upload = VkUpload(vk_session)
-        user_id = user['id']
+        user_id = data['user_id']
+        id_candidate, fio, link =  issues_candidate(user_id)
+        #print(id_candidate)
         get_photo_url = self.url + 'photos.get'
         get_photos_params = {
-            'owner_id': user_id,
+            'owner_id': id_candidate,
             'album_id': 'profile',
             'extended': '1',
-            'count': 20,
+            'count': 50,
         }
         req = requests.get(get_photo_url, params={**self.params, **get_photos_params}).json()
             
@@ -113,7 +123,7 @@ class VKUser():
         else:
             pass
 
-        return ','.join(l_s_photo)
+        return  fio, link, ','.join(l_s_photo), id_candidate
 
 
 

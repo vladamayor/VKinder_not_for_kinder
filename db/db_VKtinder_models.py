@@ -18,9 +18,9 @@ class Candidat(Base):
 
     id = sq.Column(sq.Integer, primary_key=True)
     candidate_vk_id = sq.Column(sq.Integer, unique=True)
-    first_last_name = sq.Column(sq.String(length=40))
+    first_last_name = sq.Column(sq.String(length=100))
     link = sq.Column(sq.String(length=1000))
-    photos = sq.Column(sq.String(length=1000))
+    #photos = sq.Column(sq.String(length=1000))
     id_user = sq.Column(sq.Integer, sq.ForeignKey("users.id"), nullable=False)
 
     user = relationship(User, backref="candidat")
