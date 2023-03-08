@@ -35,7 +35,7 @@ class Favorit(Base):
     favorite_vk_id = sq.Column(sq.Integer, unique=True)
     first_last_name = sq.Column(sq.String(length=40))
     link = sq.Column(sq.String(length=1000))
-    photos = sq.Column(sq.String(length=1000))
+    #photos = sq.Column(sq.String(length=1000))
     id_user = sq.Column(sq.Integer, sq.ForeignKey("users.id"), nullable=False)
 
     user = relationship(User, backref="favorit")

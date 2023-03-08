@@ -45,12 +45,12 @@ def adding_data_candidates(candidate_id, first_last_name, link, user_id):
 
 # Добавляет даныые в базу favorites.
 # (id_vk , имя и фамилию, ссылку на страничку, фото). Параметр user_id принимает vk_id польз-я который сделал запрос.
-def adding_data_favorites(favorite_vk_id, first_last_name, link, photos, user_id):
+def adding_data_favorites(favorite_vk_id, first_last_name, link, user_id):
     # Поиск ID в базе по id в VK. Принимает на вход id VK, на выходе id в базе(Целое число)
     res = session.query(User.id).filter(User.user_vk_id == user_id).all()
     ress = res[0][0]
     session.add(Favorit(favorite_vk_id=favorite_vk_id, first_last_name=first_last_name,
-                        link=link, photos=photos, id_user=ress))
+                        link=link, id_user=ress))
     session.commit()
     session.close()
 
@@ -71,8 +71,8 @@ def issues_favorite(user_id):
     res = session.query(User.id).filter(User.user_vk_id == user_id).all()
     ress = res[0][0]
     # Выдает по одному из избранных.
-    for result in session.query(Favorit).filter(Favorit.id_user == ress).all():
-        return result
+    result = session.query(Favorit.first_last_name, Favorit.link).filter(Favorit.id_user == ress).all()
+    return result
 
 # Удаление кандидата из таблицы candidates
 def deleted_candidate(candidate_id):

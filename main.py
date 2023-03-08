@@ -4,12 +4,12 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
-from vk_bot.bot_function import write_msg, send_candidate
+from vk_bot.bot_function import write_msg, send_candidate, search_name
 from vk_bot.requests_user import VKUser
 from vk_api import VkUpload 
 import requests
 from vk_bot.bot import get_info
-from db.db_VKtinder import deleted_candidate, adding_data_favorites
+from db.db_VKtinder import deleted_candidate, adding_data_favorites, adding_data_candidates, issues_favorite, adding_data_user, deleted_candidate_all
 
 
 
@@ -20,43 +20,67 @@ longpoll = VkLongPoll(vk_session)
 candidate = VKUser(token)
 
 
-answer_show = ['поехали!', 'дальше', 'нравится']
+answer_show = ['поехали!', 'дальше', 'нравится', 'избранные', 'стоп', 'новый запрос']
 
 candidate_id_list = []
+list_info_candidate = []
 
-def show_info():
+def show_info(data):
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
             user_id = event.user_id
             text = event.text.lower()
-            
 
             if text in answer_show:
 
                 if text == 'поехали!':
                     candidate.create_archive(data, vk_session)
-                    candidate_id = send_candidate(vk_session, token, data, user_id, candidate)
+                    candidate_id, info_candidate = send_candidate(vk_session, token, data, user_id, candidate)
                     candidate_id_list.append(candidate_id)
+                    list_info_candidate.append(info_candidate)
                     
 
-                if text == 'дальше':
+                elif text == 'дальше':
                     deleted_candidate(candidate_id_list.pop())
-                    candidate_id = send_candidate(vk_session, token, data, user_id, candidate)
+                    candidate_id, first_last_name, link = list_info_candidate.pop()
+                    adding_data_candidates(candidate_id, first_last_name, link, user_id)
+                    candidate_id, info_candidate = send_candidate(vk_session, token, data, user_id, candidate)
+                    candidate_id_list.append(candidate_id)
+                    list_info_candidate.append(info_candidate)
 
-                    candidate_id_list.append(candidate_id)
                     
-                if text == 'нравится':
-                    fio, link, user_photo, candidate_id = candidate.get_photo(data, vk_session)
-                    adding_data_favorites(candidate_id_list[0], fio, link, user_photo, user_id )
+                elif text == 'нравится':
+                    candidate_id, first_last_name, link = list_info_candidate.pop()
+                    adding_data_favorites(candidate_id_list[0], first_last_name, link, user_id )
                     deleted_candidate(candidate_id_list.pop())
-                    candidate_id = send_candidate(vk_session, token, data, user_id, candidate)
+                    candidate_id, info_candidate = send_candidate(vk_session, token, data, user_id, candidate)
                     candidate_id_list.append(candidate_id)
+                    list_info_candidate.append(info_candidate)
+                    
+
+                elif text == 'избранные':
+                    result = issues_favorite(user_id)
+                    for item in result:
+                        write_msg(vk_session, user_id, f'{item[0]}, {item[1]}')
+
+
+                elif text == 'новый запрос':
+                    adding_data_user(user_id)
+                    deleted_candidate_all(user_id)
+                    write_msg(vk_session, user_id, 'Могу показать тех, кто тебе подходит. \n\
+                            Напиши через пробел: \n 1. Возраст \n 2. Пол (муж/жен) \n 3. Город')
+                    data = get_info()
+                    
+                
+
+                elif text == 'стоп':
+                    name = search_name(user_id)
+                    write_msg(vk_session, user_id, f'Пока, приходи еще, {name}!')
                     break
-
 
     return print('ok')
 
 
 
-show_info()
+show_info(data)
 

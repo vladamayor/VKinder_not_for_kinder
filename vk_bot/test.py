@@ -1,5 +1,7 @@
 a = []
-a.append('')
+a.append(('1', '5', 'f'))
 
-if  not ','.join(a):
-    print('пусто')
+print(a)
+
+h, b, c = a.pop()
+print(h, b, c)

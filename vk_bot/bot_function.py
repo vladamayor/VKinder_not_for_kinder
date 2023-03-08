@@ -21,15 +21,21 @@ def write_msg(vk_session, user_id, message, keyboard=None, attachments=None):
     vk_session.method('messages.send', post)
 
 def send_candidate(vk_session, token, data,  user_id, candidate):
-    keyboard = VkKeyboard()
-    buttons = ['Нравится', 'Дальше']
-    buttons_color = [VkKeyboardColor.POSITIVE, VkKeyboardColor.PRIMARY] 
+    keyboard = VkKeyboard(one_time=True)
+    buttons = ['Нравится', 'Дальше', 'Избранные']
+    buttons_color = [VkKeyboardColor.POSITIVE, VkKeyboardColor.PRIMARY, VkKeyboardColor.SECONDARY] 
+    for btn, btn_color in zip(buttons, buttons_color):
+        keyboard.add_button(btn, btn_color)
+    keyboard.add_line()
+    buttons = ['Стоп', 'Новый запрос']
+    buttons_color = [VkKeyboardColor.NEGATIVE ,VkKeyboardColor.PRIMARY] 
     for btn, btn_color in zip(buttons, buttons_color):
         keyboard.add_button(btn, btn_color)
     fio, link, user_photo, candidate_id = candidate.get_photo(data, vk_session)
     write_msg(vk_session, user_id, f'{fio} \n {link}', keyboard)
     write_msg(vk_session, user_id, ' ', keyboard, user_photo)
-    return candidate_id
+    info_candidate = (candidate_id, fio, link)
+    return candidate_id, info_candidate
 
 
 def search_city(city):
