@@ -61,7 +61,7 @@ def issues_candidate(user_id):
     res = session.query(User.id).filter(User.user_vk_id == user_id).all()
     ress = res[0][0]
     # Выдает по одному кандидатов.
-    result = session.query(Candidat.candidate_vk_id, Candidat.first_last_name, Candidat.link).filter(Candidat.id_user == ress).first()
+    result = session.query(Candidat.candidate_vk_id, Candidat.first_last_name, Candidat.link).order_by(Candidat.id).filter(Candidat.id_user == ress).first()
     print(result)
     return result
 
