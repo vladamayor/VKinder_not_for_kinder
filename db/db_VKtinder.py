@@ -3,7 +3,6 @@ import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 import os
 from dotenv import load_dotenv, find_dotenv
-from pprint import pprint
 
 load_dotenv(find_dotenv())
 
@@ -95,11 +94,4 @@ def deleted_favorite(favorite_id):
     session.query(Favorit).filter(Favorit.favorite_vk_id == favorite_id).delete()
     session.commit()
     session.close()
-
-
-
-# for result in session.query(Candidat).all():
-#     print(result)
-# for res in session.query(User).all():
-#     print(res)
 

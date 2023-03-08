@@ -19,14 +19,14 @@ def get_info():
     data = {}
     candidate_id_list = []
     list_info_candidate = []
-    answer_get = ['привет', 'старт', 'поехали!', 'дальше', 'нравится', 'избранные', 'стоп', 'новый запрос', 'назад', 'жен', 'муж']
+    answer_get = ['привет', 'старт', 'поехали!', 'дальше', 'нравится', 'избранные', 'стоп', 'новый запрос', 'назад']
 
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
             user_id = event.user_id
             text = event.text.lower()
 
-            if text in answer_get or text.count(' ') > 0:
+            if text in answer_get or text.count(' ') > 0 and text.split()[1] in ['муж', 'жен']:
 
                 if text == 'привет':
                     name = search_name(user_id)
@@ -41,7 +41,7 @@ def get_info():
                 
 
                 elif text == 'поехали!':
-                    candidate.create_archive(data, vk_session)
+                    candidate.create_archive(data)
                     candidate_id, info_candidate = send_candidate(vk_session, token, data, user_id, candidate)
                     candidate_id_list.append(candidate_id)
                     list_info_candidate.append(info_candidate)
