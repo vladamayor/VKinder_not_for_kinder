@@ -6,8 +6,10 @@ from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
 
-DSN = f'postgresql://{os.getenv("LOGIN")}:{os.getenv("PASSWORD")}@' \
-      f'{os.getenv("SERVER")}:{os.getenv("PORT")}/{os.getenv("DB_NAME")}'
+DSN = (
+    f'postgresql://{os.getenv("LOGIN")}:{os.getenv("PASSWORD")}@'
+    f'{os.getenv("SERVER")}:{os.getenv("PORT")}/{os.getenv("DB_NAME")}'
+)
 engine = sqlalchemy.create_engine(DSN)
 
 create_tables(engine)
@@ -36,8 +38,14 @@ def adding_data_candidates(candidate_id, first_last_name, link, user_id):
     # Поиск ID в базе по id в VK. Принимает на вход id VK, на выходе id в базе(Целое число)
     res = session.query(User.id).filter(User.user_vk_id == user_id).all()
     ress = res[0][0]
-    session.add(Candidat(candidate_vk_id=candidate_id,first_last_name=first_last_name,
-                        link=link, id_user=ress))
+    session.add(
+        Candidat(
+            candidate_vk_id=candidate_id,
+            first_last_name=first_last_name,
+            link=link,
+            id_user=ress,
+        )
+    )
     session.commit()
     session.close()
 
@@ -48,8 +56,14 @@ def adding_data_favorites(favorite_vk_id, first_last_name, link, user_id):
     # Поиск ID в базе по id в VK. Принимает на вход id VK, на выходе id в базе(Целое число)
     res = session.query(User.id).filter(User.user_vk_id == user_id).all()
     ress = res[0][0]
-    session.add(Favorit(favorite_vk_id=favorite_vk_id, first_last_name=first_last_name,
-                        link=link, id_user=ress))
+    session.add(
+        Favorit(
+            favorite_vk_id=favorite_vk_id,
+            first_last_name=first_last_name,
+            link=link,
+            id_user=ress,
+        )
+    )
     session.commit()
     session.close()
 
@@ -60,7 +74,12 @@ def issues_candidate(user_id):
     res = session.query(User.id).filter(User.user_vk_id == user_id).all()
     ress = res[0][0]
     # Выдает по одному кандидатов.
-    result = session.query(Candidat.candidate_vk_id, Candidat.first_last_name, Candidat.link).order_by(Candidat.id).filter(Candidat.id_user == ress).first()
+    result = (
+        session.query(Candidat.candidate_vk_id, Candidat.first_last_name, Candidat.link)
+        .order_by(Candidat.id)
+        .filter(Candidat.id_user == ress)
+        .first()
+    )
     print(result)
     return result
 
@@ -70,8 +89,13 @@ def issues_favorite(user_id):
     res = session.query(User.id).filter(User.user_vk_id == user_id).all()
     ress = res[0][0]
     # Выдает по одному из избранных.
-    result = session.query(Favorit.first_last_name, Favorit.link).filter(Favorit.id_user == ress).all()
+    result = (
+        session.query(Favorit.first_last_name, Favorit.link)
+        .filter(Favorit.id_user == ress)
+        .all()
+    )
     return result
+
 
 # Удаление кандидата из таблицы candidates
 def deleted_candidate(candidate_id):
@@ -94,4 +118,3 @@ def deleted_favorite(favorite_id):
     session.query(Favorit).filter(Favorit.favorite_vk_id == favorite_id).delete()
     session.commit()
     session.close()
-

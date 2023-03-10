@@ -10,7 +10,7 @@ class User(Base):
     user_vk_id = sq.Column(sq.Integer, unique=True)
 
     def __str__(self):
-        return f'{self.id}, {self.user_vk_id}'
+        return f"{self.id}, {self.user_vk_id}"
 
 
 class Candidat(Base):
@@ -25,7 +25,7 @@ class Candidat(Base):
     user = relationship(User, backref="candidat")
 
     def __str__(self):
-        return f'{self.id}, {self.candidate_vk_id}, {self.first_last_name}, {self.link}, {self.photos}, {self.id_user}'
+        return f"{self.id}, {self.candidate_vk_id}, {self.first_last_name}, {self.link}, {self.photos}, {self.id_user}"
 
 
 class Favorit(Base):
@@ -39,7 +39,7 @@ class Favorit(Base):
     user = relationship(User, backref="favorit")
 
     def __str__(self):
-        return f'{self.id}, {self.favorite_vk_id}, {self.first_last_name}, {self.link}, {self.photos}, {self.id_user}'
+        return f"{self.id}, {self.favorite_vk_id}, {self.first_last_name}, {self.link}, {self.photos}, {self.id_user}"
 
 
 def create_tables(engine):
