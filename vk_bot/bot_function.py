@@ -5,6 +5,7 @@ from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
+from db.db_VKtinder import issues_candidate
 
 
 def write_msg(vk_session, user_id, message, keyboard=None, attachments=None):
@@ -19,7 +20,7 @@ def write_msg(vk_session, user_id, message, keyboard=None, attachments=None):
     vk_session.method("messages.send", post)
 
 
-def send_candidate(vk_session, token, data, user_id, candidate):
+def send_candidate(vk_session, TOKEN, data, user_id, candidate):
     keyboard = VkKeyboard(one_time=True)
     buttons = ["Нравится", "Дальше", "Избранные"]
     buttons_color = [
@@ -34,17 +35,18 @@ def send_candidate(vk_session, token, data, user_id, candidate):
     buttons_color = [VkKeyboardColor.NEGATIVE, VkKeyboardColor.PRIMARY]
     for btn, btn_color in zip(buttons, buttons_color):
         keyboard.add_button(btn, btn_color)
-    fio, link, user_photo, candidate_id = candidate.get_photo(data, vk_session)
+    id_candidate, fio, link = issues_candidate(data["user_id"])
+    user_photo = candidate.find_most_popular(data, vk_session)
     write_msg(vk_session, user_id, f"{fio} \n {link}", keyboard)
     write_msg(vk_session, user_id, " ", keyboard, user_photo)
-    info_candidate = (candidate_id, fio, link)
-    return candidate_id, info_candidate
+    info_candidate = (id_candidate, fio, link)
+    return id_candidate, info_candidate
 
 
 def search_city(city):
-    base_host = "https://api.vk.com/"
-    uri = "method/database.getCities"
-    URL = base_host + uri
+    BASE_HOST = "https://api.vk.com/"
+    URI = "method/database.getCities"
+    URL = BASE_HOST + URI
     city_params = {
         "access_token": os.getenv("access_token_app"),
         "v": "5.131",
@@ -70,9 +72,9 @@ def collect_data(data, user_id, dict_data):
 
 
 def search_name(user_id):
-    base_host = "https://api.vk.com/"
-    uri = "method/users.get"
-    URL = base_host + uri
+    BASE_HOST = "https://api.vk.com/"
+    URI = "method/users.get"
+    URL = BASE_HOST + URI
     user_params = {
         "access_token": os.getenv("access_token_app"),
         "v": "5.131",

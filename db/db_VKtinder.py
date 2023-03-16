@@ -10,35 +10,31 @@ DSN = (
     f'postgresql://{os.getenv("LOGIN")}:{os.getenv("PASSWORD")}@'
     f'{os.getenv("SERVER")}:{os.getenv("PORT")}/{os.getenv("DB_NAME")}'
 )
-engine = sqlalchemy.create_engine(DSN)
+ENGINE = sqlalchemy.create_engine(DSN)
 
-create_tables(engine)
+create_tables(ENGINE)
 
-Session = sessionmaker(bind=engine)
-session = Session()
+Session = sessionmaker(bind=ENGINE)
+SESSION = Session()
 
 
-# Добавление ID user в базу
 def adding_data_user(data):
-    result = session.query(User.user_vk_id).all()
+    result = SESSION.query(User.user_vk_id).all()
     list_id_vk = []
     for item in result:
         list_id_vk.append(item[0])
     if data not in list_id_vk:
-        session.add(User(user_vk_id=data))
+        SESSION.add(User(user_vk_id=data))
     else:
         pass
-    session.commit()
-    session.close()
+    SESSION.commit()
+    SESSION.close()
 
 
-# Добавляет даныые candidates в базу.
-# (id_vk , имя и фамилию, ссылку на страничку, фото). Параметр user_id принимает vk_id польз-я который сделал запрос.
 def adding_data_candidates(candidate_id, first_last_name, link, user_id):
-    # Поиск ID в базе по id в VK. Принимает на вход id VK, на выходе id в базе(Целое число)
-    res = session.query(User.id).filter(User.user_vk_id == user_id).all()
+    res = SESSION.query(User.id).filter(User.user_vk_id == user_id).all()
     ress = res[0][0]
-    session.add(
+    SESSION.add(
         Candidat(
             candidate_vk_id=candidate_id,
             first_last_name=first_last_name,
@@ -46,17 +42,15 @@ def adding_data_candidates(candidate_id, first_last_name, link, user_id):
             id_user=ress,
         )
     )
-    session.commit()
-    session.close()
+    SESSION.commit()
+    SESSION.close()
 
 
-# Добавляет даныые в базу favorites.
-# (id_vk , имя и фамилию, ссылку на страничку, фото). Параметр user_id принимает vk_id польз-я который сделал запрос.
+
 def adding_data_favorites(favorite_vk_id, first_last_name, link, user_id):
-    # Поиск ID в базе по id в VK. Принимает на вход id VK, на выходе id в базе(Целое число)
-    res = session.query(User.id).filter(User.user_vk_id == user_id).all()
+    res = SESSION.query(User.id).filter(User.user_vk_id == user_id).all()
     ress = res[0][0]
-    session.add(
+    SESSION.add(
         Favorit(
             favorite_vk_id=favorite_vk_id,
             first_last_name=first_last_name,
@@ -64,18 +58,16 @@ def adding_data_favorites(favorite_vk_id, first_last_name, link, user_id):
             id_user=ress,
         )
     )
-    session.commit()
-    session.close()
+    SESSION.commit()
+    SESSION.close()
 
 
-# Выдает по одному кандидатов.
+
 def issues_candidate(user_id):
-    # Поиск ID в базе по id в VK. Принимает на вход id VK, на выходе id в базе(Целое число)
-    res = session.query(User.id).filter(User.user_vk_id == user_id).all()
+    res = SESSION.query(User.id).filter(User.user_vk_id == user_id).all()
     ress = res[0][0]
-    # Выдает по одному кандидатов.
     result = (
-        session.query(Candidat.candidate_vk_id, Candidat.first_last_name, Candidat.link)
+        SESSION.query(Candidat.candidate_vk_id, Candidat.first_last_name, Candidat.link)
         .order_by(Candidat.id)
         .filter(Candidat.id_user == ress)
         .first()
@@ -83,38 +75,45 @@ def issues_candidate(user_id):
     print(result)
     return result
 
+def issues_id_candidate(user_id):
+    res = SESSION.query(User.id).filter(User.user_vk_id == user_id).all()
+    ress = res[0][0]
+    result = (
+        SESSION.query(Candidat.candidate_vk_id)
+        .order_by(Candidat.id)
+        .filter(Candidat.id_user == ress)
+        .first()
+    )
+    return result
+
 
 def issues_favorite(user_id):
-    # Поиск ID в базе по id в VK. Принимает на вход id VK, на выходе id в базе(Целое число)
-    res = session.query(User.id).filter(User.user_vk_id == user_id).all()
+    res = SESSION.query(User.id).filter(User.user_vk_id == user_id).all()
     ress = res[0][0]
-    # Выдает по одному из избранных.
     result = (
-        session.query(Favorit.first_last_name, Favorit.link)
+        SESSION.query(Favorit.first_last_name, Favorit.link)
         .filter(Favorit.id_user == ress)
         .all()
     )
     return result
 
 
-# Удаление кандидата из таблицы candidates
+
 def deleted_candidate(candidate_id):
-    session.query(Candidat).filter(Candidat.candidate_vk_id == candidate_id).delete()
-    session.commit()
-    session.close()
+    SESSION.query(Candidat).filter(Candidat.candidate_vk_id == candidate_id).delete()
+    SESSION.commit()
+    SESSION.close()
 
 
 def deleted_candidate_all(user_id):
-    # Поиск ID в базе по его id в VK. Принимает на вход id VK, на выходе id в базе(Целое число)
-    res = session.query(User.id).filter(User.user_vk_id == user_id).all()
+    res = SESSION.query(User.id).filter(User.user_vk_id == user_id).all()
     ress = res[0][0]
-    # Удалит всех кандидатов для определенного usera
-    session.query(Candidat).filter(Candidat.id_user == ress).delete()
-    session.commit()
-    session.close()
+    SESSION.query(Candidat).filter(Candidat.id_user == ress).delete()
+    SESSION.commit()
+    SESSION.close()
 
 
 def deleted_favorite(favorite_id):
-    session.query(Favorit).filter(Favorit.favorite_vk_id == favorite_id).delete()
-    session.commit()
-    session.close()
+    SESSION.query(Favorit).filter(Favorit.favorite_vk_id == favorite_id).delete()
+    SESSION.commit()
+    SESSION.close()

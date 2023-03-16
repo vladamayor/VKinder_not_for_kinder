@@ -4,18 +4,18 @@ load_dotenv(find_dotenv())
 import requests
 from vk_api import VkUpload
 from db.db_VKtinder import adding_data_candidates
-from db.db_VKtinder import issues_candidate
+from db.db_VKtinder import issues_id_candidate
 
 
 class VKUser:
-    url = "https://api.vk.com/method/"
+    URL = "https://api.vk.com/method/"
 
     def __init__(self, token):
         self.params = {"access_token": token, "v": "5.131"}
 
-    def search_сandidates(self, data):
-        search_сandidates_url = self.url + "users.search"
-        candidates_params = {
+    def find_users(self, data):
+        user_url = self.URL + "users.search"
+        user_params = {
             "count": 1000,
             "has_photo": 1,
             "age_from": data["age_from"],
@@ -24,12 +24,16 @@ class VKUser:
             "city_id": data["city_id"],
         }
         req = requests.get(
-            search_сandidates_url, params={**self.params, **candidates_params}
-        ).json()
-        return req["response"]["items"]
+            user_url, params={**self.params, **user_params}
+        )
+        if req.status_code != 200:
+            print('Ошибка при поиске пользователей', req.json())
+        else:
+            return req.json()["response"]["items"]
 
+  
     def create_archive(self, data):
-        req = self.search_сandidates(data)
+        req = self.find_users(data)
         user_base = data["user_id"]
         for user in req:
             if user["is_closed"] == False:
@@ -45,27 +49,27 @@ class VKUser:
 
         return print("База создана")
 
-    def get_candidate(self, data):
-        user_id = data["user_id"]
-        id_candidate = issues_candidate(user_id)
-        get_candidate = self.url + "users.get"
-        get_candidate_params = {"user_ids": id_candidate}
 
-    def get_photo(self, data, vk_session):
-        upload = VkUpload(vk_session)
+    def get_photo(self, data):
         user_id = data["user_id"]
-        id_candidate, fio, link = issues_candidate(user_id)
-        get_photo_url = self.url + "photos.get"
-        get_photos_params = {
+        id_candidate = issues_id_candidate(user_id)
+        photo_url = self.URL + "photos.get"
+        photos_params = {
             "owner_id": id_candidate,
             "album_id": "profile",
             "extended": "1",
             "count": 50,
         }
         req = requests.get(
-            get_photo_url, params={**self.params, **get_photos_params}
+            photo_url, params={**self.params, **photos_params}
         ).json()
 
+        return req
+
+
+    def find_most_popular(self, data, vk_session, foto_count=3):
+        upload = VkUpload(vk_session)
+        req = self.get_photo(data)
         d_ph = {}
         l_s_photo = []
 
@@ -83,7 +87,7 @@ class VKUser:
                     if req["response"]["count"] > 3:
                         sort_d_ph = dict(
                             sorted(d_ph.items(), key=lambda x: x[0])[
-                                len(d_ph) : len(d_ph) - 4 : -1
+                                len(d_ph) : len(d_ph) - (foto_count + 1) : -1
                             ]
                         )
                         l_s_photo = list(sort_d_ph.values())
@@ -94,4 +98,4 @@ class VKUser:
         else:
             pass
 
-        return fio, link, ",".join(l_s_photo), id_candidate
+        return ",".join(l_s_photo)

@@ -42,6 +42,6 @@ class Favorit(Base):
         return f"{self.id}, {self.favorite_vk_id}, {self.first_last_name}, {self.link}, {self.photos}, {self.id_user}"
 
 
-def create_tables(engine):
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
+def create_tables(ENGINE):
+    Base.metadata.drop_all(ENGINE)
+    Base.metadata.create_all(ENGINE)
