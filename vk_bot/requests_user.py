@@ -23,31 +23,23 @@ class VKUser:
             "sex": data["sex"],
             "city_id": data["city_id"],
         }
-        req = requests.get(
-            user_url, params={**self.params, **user_params}
-        )
+        req = requests.get(user_url, params={**self.params, **user_params})
         if req.status_code != 200:
-            print('Ошибка при поиске пользователей', req.json())
+            print("Ошибка при поиске пользователей", req.json())
         else:
             return req.json()["response"]["items"]
 
-  
-    def create_archive(self, data):
+    def findandsave_users(self, data):
         req = self.find_users(data)
         user_base = data["user_id"]
         for user in req:
             if user["is_closed"] == False:
-                user_data = {}
                 base_user_host = "https://vk.com/id"
                 candidate = [user["first_name"], user["last_name"]]
                 fio = " ".join(candidate)
-                user_data["user"] = fio
                 user_id = user["id"]
-                user_data["link"] = base_user_host + str(user_id)
                 link = base_user_host + str(user_id)
                 adding_data_candidates(user_id, fio, link, user_base)
-
-        return print("База создана")
 
 
     def get_photo(self, data):
@@ -60,42 +52,29 @@ class VKUser:
             "extended": "1",
             "count": 50,
         }
-        req = requests.get(
-            photo_url, params={**self.params, **photos_params}
-        ).json()
+        req = requests.get(photo_url, params={**self.params, **photos_params}).json()
 
         return req
 
-
-    def find_most_popular(self, data, vk_session, foto_count=3):
+    def find_most_popular(self, data, vk_session, photo_count=3):
         upload = VkUpload(vk_session)
         req = self.get_photo(data)
-        d_ph = {}
         l_s_photo = []
 
-        if "response" in req.keys():
-            if req["response"]["count"] == 0:
-                l_s_photo.append("")
-            else:
-                for photos in req["response"]["items"]:
-                    image_url = photos["sizes"][-1]["url"]
-                    image = requests.get(image_url, stream=True)
-                    photo = upload.photo_messages(photos=[image.raw])[0]
-                    d_ph[photos["likes"]["count"]] = "photo{}_{}".format(
-                        photo["owner_id"], photo["id"]
-                    )
-                    if req["response"]["count"] > 3:
-                        sort_d_ph = dict(
-                            sorted(d_ph.items(), key=lambda x: x[0])[
-                                len(d_ph) : len(d_ph) - (foto_count + 1) : -1
-                            ]
-                        )
-                        l_s_photo = list(sort_d_ph.values())
-
-                    elif req["response"]["count"] <= 3:
-                        l_s_photo = d_ph.values()
-
+        photos = [
+            (photo["likes"]["count"], photo["sizes"][-1]["url"])
+            for photo in req["response"]["items"]
+        ]
+        if req["response"]["count"] > photo_count:
+            top_photos = sorted(photos)[
+                len(photos) : len(photos) - (photo_count + 1) : -1
+            ]
         else:
-            pass
+            top_photos = photos
+        for url in top_photos:
+            image = requests.get(url[1], stream=True)
+            att_photo = upload.photo_messages(photos=[image.raw])[0]
+            attachment = "photo{}_{}".format(att_photo["owner_id"], att_photo["id"])
+            l_s_photo.append(attachment)
 
         return ",".join(l_s_photo)

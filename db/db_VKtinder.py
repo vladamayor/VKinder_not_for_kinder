@@ -46,7 +46,6 @@ def adding_data_candidates(candidate_id, first_last_name, link, user_id):
     SESSION.close()
 
 
-
 def adding_data_favorites(favorite_vk_id, first_last_name, link, user_id):
     res = SESSION.query(User.id).filter(User.user_vk_id == user_id).all()
     ress = res[0][0]
@@ -62,7 +61,6 @@ def adding_data_favorites(favorite_vk_id, first_last_name, link, user_id):
     SESSION.close()
 
 
-
 def issues_candidate(user_id):
     res = SESSION.query(User.id).filter(User.user_vk_id == user_id).all()
     ress = res[0][0]
@@ -74,6 +72,7 @@ def issues_candidate(user_id):
     )
     print(result)
     return result
+
 
 def issues_id_candidate(user_id):
     res = SESSION.query(User.id).filter(User.user_vk_id == user_id).all()
@@ -96,7 +95,6 @@ def issues_favorite(user_id):
         .all()
     )
     return result
-
 
 
 def deleted_candidate(candidate_id):

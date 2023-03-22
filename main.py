@@ -66,11 +66,11 @@ def get_info():
                         VK_SESSION,
                         user_id,
                         "Могу показать тех, кто тебе подходит. \n\
-                            Напиши через пробел: \n 1. Возраст \n 2. Пол (муж/жен) \n 3. Город",
+                            Напиши через пробел свои данные: \n 1. Возраст \n 2. Пол (муж/жен) \n 3. Город",
                     )
 
                 elif text == "поехали!":
-                    CANDIDATE.create_archive(data)
+                    CANDIDATE.findandsave_users(data)
                     candidate_id, info_candidate = send_candidate(
                         VK_SESSION, TOKEN, data, user_id, CANDIDATE
                     )
@@ -150,6 +150,5 @@ def get_info():
     return print("Бот работу завершил")
 
 
-get_info()
-
-
+if __name__ == '__main__':
+    get_info()
